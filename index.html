@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>$STACHE - Victory to the Stache</title>
-    <!-- Your original site's stylesheet -->
     <link rel="stylesheet" href="style.css"> 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Combined Google Fonts for site and game -->
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Lato:wght@400;700&family=Poppins:wght@600;800&display=swap" rel="stylesheet">
 
     <!-- === STYLES FOR THE QUICK THINKER GAME === -->
@@ -33,15 +31,15 @@
             text-transform: uppercase;
         }
 
-        /* Quick Thinker Specific Styles */
+        /* BUG FIX: This container establishes a new stacking context, fixing the text bleed issue. */
         #main-container {
             width: 100%;
             max-width: 500px;
             position: relative;
             margin: 0 auto;
-            font-family: 'Poppins', sans-serif;
+            z-index: 10;
         }
-
+        
         .game-screen {
             display: flex;
             flex-direction: column;
@@ -52,6 +50,7 @@
             padding: 20px;
             box-sizing: border-box;
             aspect-ratio: 1 / 1.1;
+            font-family: 'Poppins', sans-serif;
         }
         
         #top-bar {
@@ -168,9 +167,10 @@
             background-color: rgba(18, 18, 18, 0.7); backdrop-filter: blur(5px);
             transition: opacity 0.3s ease; z-index: 100;
             border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
         }
         
-        #name-input-screen, #startScreen { background: none; backdrop-filter: none; position: static; }
+        .screen.static { position: static; background: none; backdrop-filter: none; }
         
         .player-input {
             width: 80%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 2px solid var(--medium-grey);
@@ -182,10 +182,9 @@
         .screen h1 {
             font-size: 52px; font-weight: 800; color: var(--light-grey);
             text-shadow: 0 4px 10px rgba(0,0,0,0.5); margin: 0;
-            font-family: 'Poppins', sans-serif;
         }
         .screen h1 .accent { color: var(--accent-red); }
-        .screen p { font-size: 16px; margin: 20px 0 30px; font-weight: 600; font-family: 'Poppins', sans-serif; }
+        .screen p { font-size: 16px; margin: 20px 0 30px; font-weight: 600; }
         
         .play-button {
             background-color: var(--accent-brown); color: var(--darkest-black); padding: 15px 40px;
@@ -216,13 +215,13 @@
             <div class="nav-links">
                 <a href="#lore">Lore</a>
                 <a href="#tokenomics">Tokenomics</a>
-                <a href="#quick-thinker-arcade">Arcade</a>
+                <a href="#stache-arcade">Arcade</a>
             </div>
         </div>
     </nav>
 
     <header class="hero-section">
-        <div class="hero-content">
+         <div class="hero-content">
             <img src="stache-logo.webp" alt="$STACHE Logo" class="hero-logo">
             <h1 class="main-headline">$STACHE</h1>
             <p class="sub-headline">VICTORY TO THE $STACHE</p>
@@ -248,7 +247,7 @@
         </section>
 
         <section id="tokenomics" class="tokenomics-section">
-            <div class="container">
+             <div class="container">
                 <h2>The War Economy</h2>
                 <div class="tokenomics-grid">
                     <div class="token-card">
@@ -265,10 +264,12 @@
             </div>
         </section>
 
-        <!-- === NEW QUICK THINKER ARCADE SECTION === -->
-        <section id="quick-thinker-arcade" class="game-section">
+        <!-- === $STACHE ARCADE SECTION === -->
+        <section id="stache-arcade" class="game-section">
             <div class="container">
                 <h2>$STACHE ARCADE</h2>
+                
+                <!-- Quick Thinker Game Container -->
                 <div id="main-container">
                     <div id="gameScreen" class="game-screen hidden">
                         <div id="top-bar">
@@ -303,18 +304,21 @@
                         </div>
                         <div style="height: 50px;"></div> 
                     </div>
-                    <div id="startScreen" class="screen">
+
+                    <div id="startScreen" class="screen static">
                         <h1>Quick <span class="accent">Thinker</span></h1>
                         <p>Choose your game mode</p>
                         <button class="play-button" style="margin-bottom: 15px;" onclick="setMode('single')">Single Player</button>
                         <button class="play-button" onclick="setMode('multi')">Play with Friends</button>
                     </div>
+                    
                     <div id="name-input-screen" class="screen hidden">
                         <p style="font-size: 20px; font-weight: 800;">Enter Player Names</p>
                         <input type="text" id="p1-name" class="player-input" placeholder="Player 1 Name" value="Player 1">
                         <input type="text" id="p2-name" class="player-input" placeholder="Player 2 Name" value="Player 2">
                         <button class="play-button" onclick="startMultiplayerGame()">Start Match</button>
                     </div>
+
                     <div id="resultScreen" class="screen hidden">
                         <h1 id="result-title">Game <span class="accent">Over</span></h1>
                         <p id="result-text"></p>
@@ -332,7 +336,6 @@
         </div>
     </footer>
 
-    <!-- Your original site's script for things like the copy button -->
     <script src="script.js"></script>
 
     <!-- === QUICK THINKER GAME JAVASCRIPT === -->
