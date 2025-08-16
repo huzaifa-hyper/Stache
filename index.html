@@ -4,101 +4,126 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>$STACHE - Victory to the Stache</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css"> 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Combined Google Fonts for site and game -->
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Lato:wght@400;700&family=Poppins:wght@600;800&display=swap" rel="stylesheet">
 
-    <!-- === STYLES FOR THE GAME SECTION === -->
+    <!-- === COMBINED STYLES FOR ALL GAMES === -->
     <style>
         :root {
             --light-grey: #A9A9AA; --near-black: #1B1B1B; --dark-grey: #373636;
             --medium-grey: #424242; --darkest-black: #121212; --accent-red: #9C3A3B;
             --accent-brown: #A67A4B;
+            /* Extra colors for Simon Says */
+            --simon-blue: #5582f6;
+            --simon-green: #50a14f;
         }
         .game-section {
-            background-color: var(--near-black);
-            padding: 60px 20px;
-            text-align: center;
+            background-color: var(--near-black); padding: 60px 20px; text-align: center;
         }
         .game-section h2 {
-            color: #fff;
-            margin-bottom: 40px;
-            font-family: 'Oswald', sans-serif;
-            font-size: 2.5rem;
-            text-transform: uppercase;
+            color: #fff; margin-bottom: 40px; font-family: 'Oswald', sans-serif;
+            font-size: 2.5rem; text-transform: uppercase;
         }
-        #main-container {
-            width: 100%;
-            max-width: 450px;
-            position: relative;
-            margin: 0 auto;
+        .hidden { display: none !important; }
+
+        /* --- Arcade Menu Styles --- */
+        #arcade-menu {
+            display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 30px;
         }
-        #game-container {
-            width: 100%; aspect-ratio: 1 / 1.15; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            border-radius: 10px; flex-direction: column; justify-content: center;
-            align-items: center; display: none; 
-        }
-        #status-display {
-            width: 100%; padding: 10px 0; font-size: 20px; font-weight: 600;
-            color: var(--light-grey); text-align: center; height: 10%;
+        .arcade-menu-button {
+            background-color: var(--dark-grey); color: var(--light-grey); padding: 15px 40px;
+            border: none; border-radius: 50px; font-size: 20px; font-weight: 800; cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.2s ease; width: 80%; max-width: 400px;
             font-family: 'Poppins', sans-serif;
         }
-        #game-board {
-            display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
-            width: 100%; height: 90%; gap: 10px; background-color: var(--dark-grey);
-            padding: 10px; border-radius: 10px; box-sizing: border-box;
+        .arcade-menu-button:hover { background-color: var(--accent-brown); color: var(--darkest-black); transform: scale(1.05); }
+
+        /* --- General Game Container Styles --- */
+        .game-wrapper {
+            width: 100%; max-width: 500px; position: relative; margin: 0 auto;
+            font-family: 'Poppins', sans-serif;
         }
-        .cell {
-            background-color: var(--light-grey); border-radius: 8px; cursor: pointer;
-            display: flex; justify-content: center; align-items: center; position: relative;
+        .game-screen {
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+            background-color: var(--dark-grey); border-radius: 10px; padding: 20px;
+            box-sizing: border-box; aspect-ratio: 1 / 1.1;
         }
-        .cell:not(.x):not(.o):hover { background-color: #c1c1c2; }
-        .cell.x::before, .cell.x::after {
-            content: ''; position: absolute; width: 75%; height: 12%; background-color: var(--accent-red);
-            border-radius: 5px; animation: draw-in 0.3s ease-out forwards;
-        }
-        .cell.x::before { transform: rotate(45deg); }
-        .cell.x::after { transform: rotate(-45deg); }
-        .cell.o::before {
-            content: ''; position: absolute; width: 70%; height: 70%;
-            border: 15px solid var(--accent-brown); border-radius: 50%;
-            box-sizing: border-box; animation: draw-in 0.3s ease-out forwards;
-        }
-        @keyframes draw-in { 0% { opacity: 0; transform: scale(0); } 100% { opacity: 1; transform: scale(1); } }
-        .cell.win { animation: pulse 0.8s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             color: var(--light-grey); text-align: center; background-color: rgba(18, 18, 18, 0.7);
-            backdrop-filter: blur(5px); transition: opacity 0.3s ease; z-index: 100;
+            backdrop-filter: blur(5px); transition: opacity 0.3s ease; z-index: 100; border-radius: 10px;
         }
-        #modeSelectScreen { position: static; background: none; backdrop-filter: none; font-family: 'Poppins', sans-serif; }
-        .hidden { opacity: 0; pointer-events: none; }
-        .invisible { display: none; }
+        .screen.static { position: static; background: none; backdrop-filter: none; }
         .screen h1 {
             font-size: 52px; font-weight: 800; color: var(--light-grey);
-            text-shadow: 0 4px 10px rgba(0,0,0,0.5); margin: 0;
-            font-family: 'Poppins', sans-serif;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5); margin: 0; font-family: 'Poppins', sans-serif;
         }
-        h1 .accent-x { color: var(--accent-red); }
-        h1 .accent-o { color: var(--accent-brown); }
-        .screen p { font-size: 16px; margin: 20px 0 30px; font-weight: 600; font-family: 'Poppins', sans-serif;}
-        .screen button {
+        .screen p { font-size: 16px; margin: 20px 0 30px; font-weight: 600; font-family: 'Poppins', sans-serif; }
+        .play-button {
             background-color: var(--accent-brown); color: var(--darkest-black); padding: 15px 40px;
             border: none; border-radius: 50px; font-size: 20px; font-weight: 800; cursor: pointer;
-            transition: transform 0.2s ease, background-color 0.2s ease; width: 80%; margin-top: 15px;
+            transition: transform 0.2s ease, background-color 0.2s ease; width: 70%; max-width: 300px;
             font-family: 'Poppins', sans-serif;
         }
-        .screen button:hover { background-color: var(--accent-red); color: var(--light-grey); transform: scale(1.05); }
-        @media (max-width: 480px) {
+        .play-button:hover { background-color: var(--accent-red); color: var(--light-grey); transform: scale(1.05); }
+
+        /* --- Tic-Tac-Toe Styles --- */
+        #tictactoe-container .game-screen { aspect-ratio: 1 / 1.15; max-width: 450px; }
+        #ttt-status-display { width: 100%; padding: 10px 0; font-size: 20px; font-weight: 600; color: var(--light-grey); text-align: center; height: 10%; }
+        #ttt-game-board { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); width: 100%; height: 90%; gap: 10px; background-color: var(--dark-grey); padding: 10px; border-radius: 10px; box-sizing: border-box; }
+        .cell { background-color: var(--light-grey); border-radius: 8px; cursor: pointer; display: flex; justify-content: center; align-items: center; position: relative; }
+        .cell:not(.x):not(.o):hover { background-color: #c1c1c2; }
+        .cell.x::before, .cell.x::after { content: ''; position: absolute; width: 75%; height: 12%; background-color: var(--accent-red); border-radius: 5px; animation: ttt-draw-in 0.3s ease-out forwards; }
+        .cell.x::before { transform: rotate(45deg); } .cell.x::after { transform: rotate(-45deg); }
+        .cell.o::before { content: ''; position: absolute; width: 70%; height: 70%; border: 15px solid var(--accent-brown); border-radius: 50%; box-sizing: border-box; animation: ttt-draw-in 0.3s ease-out forwards; }
+        @keyframes ttt-draw-in { 0% { opacity: 0; transform: scale(0); } 100% { opacity: 1; transform: scale(1); } }
+        .cell.win { animation: ttt-pulse 0.8s infinite; }
+        @keyframes ttt-pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        #tictactoe-container .screen button { width: 80%; margin-top: 15px; }
+
+        /* --- Quick Thinker Styles --- */
+        #top-bar { width: 100%; }
+        #match-timer-bar { width: 100%; height: 10px; background-color: var(--medium-grey); border-radius: 5px; overflow: hidden; margin-bottom: 5px; }
+        #match-timer-progress { width: 100%; height: 100%; background-color: var(--accent-red); border-radius: 5px; transition: width 0.2s linear; }
+        .score-display-container { display: flex; justify-content: space-between; width: 100%; font-size: 18px; }
+        .player-name { font-weight: 800; } .player-score { color: var(--light-grey); font-weight: 800; }
+        .p1-color { color: var(--accent-brown); } .p2-color { color: var(--accent-red); } .sp-color { color: var(--light-grey); }
+        #game-content-container { display: flex; flex-direction: column; justify-content: center; align-items: center; flex-grow: 1; width: 100%; }
+        #question-view { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
+        #timer-container { position: relative; width: 150px; height: 150px; display: flex; justify-content: center; align-items: center; }
+        #timer-text { position: absolute; font-size: 50px; font-weight: 800; color: var(--light-grey); transition: color 0.3s ease-in-out; line-height: 1; z-index: 1; }
+        #timer-text.urgent { color: var(--accent-red); }
+        #timer-svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+        .timer-ring { stroke: var(--accent-brown); stroke-width: 10; fill: transparent; }
+        #prompt-display { font-size: 22px; font-weight: 600; color: var(--light-grey); text-align: center; padding: 0 10px; }
+        .bottom-controls { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .game-button { padding: 15px 40px; border: none; border-radius: 50px; font-size: 18px; font-weight: 800; cursor: pointer; transition: transform 0.2s, opacity 0.2s; width: 80%; max-width: 300px; }
+        .game-button:hover { transform: scale(1.05); }
+        #success-btn { background-color: var(--accent-brown); color: var(--darkest-black); }
+        #fail-btn { background-color: var(--medium-grey); color: var(--light-grey); }
+        #repeat-btn { background-color: var(--darkest-black); color: var(--light-grey); }
+        .player-input { width: 80%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 2px solid var(--medium-grey); background-color: var(--light-grey); font-size: 16px; font-family: 'Poppins', sans-serif; font-weight: 600; }
+
+        /* --- Simon Says Styles --- */
+        #ss-game-board { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; aspect-ratio: 1 / 1; position: relative; width: 100%; }
+        .simon-button { border-radius: 15px; cursor: pointer; transition: background-color 0.1s ease-in-out, transform 0.1s ease-in-out; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        #ss-red { background-color: var(--simon-red); } #ss-brown { background-color: var(--accent-brown); }
+        #ss-blue { background-color: var(--simon-blue); } #ss-green { background-color: var(--simon-green); }
+        .simon-button.lit { transform: scale(1.05); filter: brightness(1.5); }
+        #ss-status-display { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40%; height: 40%; background-color: var(--dark-grey); border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--light-grey); font-weight: 600; pointer-events: none; }
+        #ss-score { font-size: 40px; font-weight: 800; }
+        #ss-message { font-size: 14px; }
+        
+        @media (max-width: 500px) {
             .screen h1 { font-size: 40px; }
-            #status-display { font-size: 16px; }
             .screen p { font-size: 14px; margin: 15px 0 25px; }
-            .screen button { font-size: 18px; padding: 12px 30px; }
+            .play-button, .arcade-menu-button { font-size: 18px; padding: 12px 30px; }
+            #prompt-display { font-size: 18px; }
             .cell.o::before { border-width: 12px; }
+            #ss-score { font-size: 32px; } #ss-message { font-size: 12px; }
         }
     </style>
 </head>
@@ -113,14 +138,13 @@
             <div class="nav-links">
                 <a href="#lore">Lore</a>
                 <a href="#tokenomics">Tokenomics</a>
-                <!-- Link to the new arcade section -->
                 <a href="#stache-arcade">Arcade</a>
             </div>
         </div>
     </nav>
 
     <header class="hero-section">
-        <div class="hero-content">
+         <div class="hero-content">
             <img src="stache-logo.webp" alt="$STACHE Logo" class="hero-logo">
             <h1 class="main-headline">$STACHE</h1>
             <p class="sub-headline">VICTORY TO THE $STACHE</p>
@@ -146,7 +170,7 @@
         </section>
 
         <section id="tokenomics" class="tokenomics-section">
-            <div class="container">
+             <div class="container">
                 <h2>The War Economy</h2>
                 <div class="tokenomics-grid">
                     <div class="token-card">
@@ -163,25 +187,113 @@
             </div>
         </section>
 
-        <!-- === NEW $STACHE ARCADE SECTION === -->
+        <!-- === $STACHE ARCADE SECTION WITH ALL GAMES === -->
         <section id="stache-arcade" class="game-section">
             <div class="container">
                 <h2>$STACHE ARCADE</h2>
-                <div id="main-container">
-                    <div id="modeSelectScreen" class="screen">
-                        <h1>Tic<span class="accent-x">-</span>Tac<span class="accent-o">-</span>Toe</h1>
+
+                <div id="arcade-menu">
+                    <button class="arcade-menu-button" onclick="showGame('tictactoe')">Play Tic-Tac-Toe</button>
+                    <button class="arcade-menu-button" onclick="showGame('quickthinker')">Play Quick Thinker</button>
+                    <button class="arcade-menu-button" onclick="showGame('simonsays')">Play Simon Says</button>
+                </div>
+
+                <!-- Tic-Tac-Toe Game Container -->
+                <div id="tictactoe-container" class="game-wrapper hidden">
+                    <div id="ttt-modeSelectScreen" class="screen static">
+                        <h1>Tic<span style="color:var(--accent-red);">-</span>Tac<span style="color:var(--accent-brown);">-</span>Toe</h1>
                         <p>Choose your game mode</p>
-                        <button onclick="selectMode('ai')">Player vs AI</button>
-                        <button onclick="selectMode('2player')">2 Players</button>
+                        <button class="play-button" style="margin-bottom: 15px;" onclick="ttt_selectMode('ai')">Player vs AI</button>
+                        <button class="play-button" onclick="ttt_selectMode('2player')">2 Players</button>
                     </div>
-                    <div id="game-container">
-                        <div id="status-display"></div>
-                        <div id="game-board"></div>
-                        <div id="resultScreen" class="screen hidden">
-                            <h1 id="result-title"></h1>
-                            <p id="result-text"></p>
-                            <button onclick="startGame()">Play Again</button>
+                    <div id="ttt-game-container" class="game-screen hidden">
+                        <div id="ttt-status-display"></div>
+                        <div id="ttt-game-board"></div>
+                        <div id="ttt-resultScreen" class="screen hidden">
+                            <h1 id="ttt-result-title"></h1>
+                            <p id="ttt-result-text"></p>
+                            <button class="play-button" onclick="ttt_startGame()">Play Again</button>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Quick Thinker Game Container -->
+                <div id="quickthinker-container" class="game-wrapper hidden">
+                    <div id="qt-gameScreen" class="game-screen hidden">
+                        <div id="top-bar">
+                            <div id="singleplayer-ui" class="score-display-container hidden">
+                                <div id="streak-display"><span class="sp-color player-name">Streak: </span><span class="player-score">0</span></div>
+                            </div>
+                            <div id="multiplayer-ui" class="hidden" style="width: 100%;">
+                                <div id="match-timer-bar"><div id="match-timer-progress"></div></div>
+                                <div class="score-display-container">
+                                    <div id="p1-score-display">P1: 0</div>
+                                    <div id="p2-score-display">P2: 0</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="game-content-container">
+                            <div id="question-view">
+                                <div id="timer-container">
+                                    <div id="timer-text">10</div>
+                                    <svg id="timer-svg" width="150" height="150">
+                                        <circle class="timer-ring" cx="75" cy="75" r="65"></circle>
+                                    </svg>
+                                </div>
+                                <div id="prompt-display">Get Ready...</div>
+                            </div>
+                            <div id="response-view" class="bottom-controls hidden">
+                                <div id="response-container" style="display: flex; flex-direction: column; align-items: center; gap: 15px; width: 100%;">
+                                    <button id="success-btn" class="game-button" onclick="qt_handleResponse(true)">I Did It!</button>
+                                    <button id="fail-btn" class="game-button" onclick="qt_handleResponse(false)">Couldn't Think</button>
+                                </div>
+                                <button id="repeat-btn" class="game-button" onclick="qt_handleRepeat()">Skip Question (+7s)</button>
+                            </div>
+                        </div>
+                        <div style="height: 50px;"></div>
+                    </div>
+                    <div id="qt-startScreen" class="screen static">
+                        <h1>Quick <span class="accent">Thinker</span></h1>
+                        <p>Choose your game mode</p>
+                        <button class="play-button" style="margin-bottom: 15px;" onclick="qt_setMode('single')">Single Player</button>
+                        <button class="play-button" onclick="qt_setMode('multi')">Play with Friends</button>
+                    </div>
+                    <div id="qt-name-input-screen" class="screen hidden">
+                        <p style="font-size: 20px; font-weight: 800;">Enter Player Names</p>
+                        <input type="text" id="p1-name" class="player-input" placeholder="Player 1 Name" value="Player 1">
+                        <input type="text" id="p2-name" class="player-input" placeholder="Player 2 Name" value="Player 2">
+                        <button class="play-button" onclick="qt_startMultiplayerGame()">Start Match</button>
+                    </div>
+                    <div id="qt-resultScreen" class="screen hidden">
+                        <h1 id="qt-result-title">Game <span class="accent">Over</span></h1>
+                        <p id="qt-result-text"></p>
+                        <button class="play-button" onclick="qt_showStartScreen()">Main Menu</button>
+                    </div>
+                </div>
+                
+                <!-- Simon Says Game Container -->
+                <div id="simonsays-container" class="game-wrapper hidden">
+                    <div id="ss-startScreen" class="screen static">
+                        <h1>Simon <span style="color: var(--accent-red);">Says</span></h1>
+                        <p>Repeat the sequence to win!</p>
+                        <button class="play-button" onclick="ss_startGame()">Start Game</button>
+                    </div>
+                    <div id="ss-game-board-wrapper" class="hidden" style="width: 100%;">
+                        <div id="ss-game-board">
+                            <div class="simon-button" id="ss-red" data-color="red"></div>
+                            <div class="simon-button" id="ss-brown" data-color="brown"></div>
+                            <div class="simon-button" id="ss-blue" data-color="blue"></div>
+                            <div class="simon-button" id="ss-green" data-color="green"></div>
+                            <div id="ss-status-display">
+                                <div id="ss-score">0</div>
+                                <div id="ss-message"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="ss-gameOverScreen" class="screen hidden">
+                        <h1>Game <span style="color: var(--accent-red);">Over</span></h1>
+                        <p id="ss-result-text">You reached level 0</p>
+                        <button class="play-button" onclick="ss_startGame()">Play Again</button>
                     </div>
                 </div>
             </div>
@@ -195,133 +307,30 @@
         </div>
     </footer>
 
-    <!-- This is your site's original script for things like the copy button -->
     <script src="script.js"></script>
 
-    <!-- === GAME JAVASCRIPT ADDED HERE === -->
     <script>
-        const gameBoard = document.getElementById('game-board');
-        const resultScreen = document.getElementById('resultScreen');
-        const resultTitle = document.getElementById('result-title');
-        const resultText = document.getElementById('result-text');
-        const statusDisplay = document.getElementById('status-display');
-        const modeSelectScreen = document.getElementById('modeSelectScreen');
-        const gameContainer = document.getElementById('game-container');
-        let gameMode = 'ai';
-        let currentPlayer = 'x';
-        let gameState = Array(9).fill("");
-        let gameActive = true;
-        const winningConditions = [ [0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6] ];
-        function selectMode(mode) {
-            gameMode = mode;
-            modeSelectScreen.classList.add('invisible');
-            gameContainer.style.display = 'flex';
-            startGame();
+        // --- ARCADE MENU LOGIC ---
+        const ttt_container = document.getElementById('tictactoe-container');
+        const qt_container = document.getElementById('quickthinker-container');
+        const ss_container = document.getElementById('simonsays-container');
+        const arcadeMenu = document.getElementById('arcade-menu');
+
+        function showGame(gameName) {
+            arcadeMenu.classList.add('hidden');
+            if (gameName === 'tictactoe') ttt_container.classList.remove('hidden');
+            else if (gameName === 'quickthinker') qt_container.classList.remove('hidden');
+            else if (gameName === 'simonsays') ss_container.classList.remove('hidden');
         }
-        function startGame() {
-            gameActive = true;
-            currentPlayer = 'x';
-            gameState.fill("");
-            resultScreen.classList.add('hidden');
-            gameBoard.innerHTML = '';
-            updateStatus();
-            for (let i = 0; i < 9; i++) {
-                const cell = document.createElement('div');
-                cell.classList.add('cell');
-                cell.setAttribute('data-cell-index', i);
-                cell.addEventListener('click', handleCellClick);
-                gameBoard.appendChild(cell);
-            }
-        }
-        function handleCellClick(e) {
-            const clickedCell = e.target;
-            const clickedCellIndex = parseInt(clickedCell.getAttribute('data-cell-index'));
-            if (gameState[clickedCellIndex] !== "" || !gameActive) return;
-            placeMark(clickedCell, clickedCellIndex);
-            if (checkResult()) return;
-            changePlayer();
-            if (gameMode === 'ai' && currentPlayer === 'o' && gameActive) {
-                gameActive = false;
-                setTimeout(aiMove, 700);
-            }
-        }
-        function aiMove() {
-            let move = findBestMove();
-            if (move === null) return;
-            const cell = document.querySelector(`[data-cell-index='${move}']`);
-            placeMark(cell, move);
-            if (checkResult()) { gameActive = true; return; }
-            changePlayer();
-            gameActive = true;
-        }
-        function findBestMove() {
-            for (let i = 0; i < 9; i++) {
-                if (gameState[i] === "") {
-                    gameState[i] = 'o';
-                    if (isWinner('o')) { gameState[i] = ""; return i; }
-                    gameState[i] = "";
-                }
-            }
-            for (let i = 0; i < 9; i++) {
-                if (gameState[i] === "") {
-                    gameState[i] = 'x';
-                    if (isWinner('x')) { gameState[i] = ""; return i; }
-                    gameState[i] = "";
-                }
-            }
-            const strategicMoves = [4, 0, 2, 6, 8, 1, 3, 5, 7];
-            for (const move of strategicMoves) { if (gameState[move] === "") return move; }
-            return null;
-        }
-        function isWinner(player) {
-            return winningConditions.some(combination => combination.every(index => gameState[index] === player));
-        }
-        function placeMark(cell, index) {
-            gameState[index] = currentPlayer;
-            cell.classList.add(currentPlayer);
-        }
-        function checkResult() {
-            let roundWon = false, winningCombo = [];
-            for (const condition of winningConditions) {
-                const [a, b, c] = condition;
-                if (gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c]) {
-                    roundWon = true; winningCombo = condition; break;
-                }
-            }
-            if (roundWon) { endGame(false, winningCombo); return true; }
-            if (!gameState.includes("")) { endGame(true); return true; }
-            return false;
-        }
-        function changePlayer() {
-            currentPlayer = currentPlayer === 'x' ? 'o' : 'x';
-            updateStatus();
-        }
-        function endGame(isDraw, winningCombo = []) {
-            gameActive = false;
-            if (isDraw) {
-                resultTitle.innerHTML = `It's a <span class="accent-o">Draw!</span>`;
-                resultText.textContent = "A well-fought battle.";
-            } else {
-                winningCombo.forEach(index => document.querySelector(`[data-cell-index='${index}']`).classList.add('win'));
-                if (gameMode === 'ai') {
-                    const winnerText = currentPlayer === 'x' ? "You Win!" : "AI Wins!";
-                    resultTitle.innerHTML = winnerText.replace('You', `<span class="accent-x">You</span>`).replace('AI', `<span class="accent-o">AI</span>`);
-                } else {
-                    resultTitle.innerHTML = `Player <span class="accent-${currentPlayer}">${currentPlayer.toUpperCase()}</span> Wins!`;
-                }
-                resultText.textContent = "Well played!";
-            }
-            setTimeout(() => resultScreen.classList.remove('hidden'), 1200);
-        }
-        function updateStatus() {
-            if (!gameActive) return;
-            if (gameMode === 'ai') {
-                statusDisplay.textContent = currentPlayer === 'x' ? "Your Turn" : "AI is thinking...";
-            } else {
-                statusDisplay.textContent = `Player ${currentPlayer.toUpperCase()}'s Turn`;
-            }
-        }
+
+        // --- TIC-TAC-TOE SCRIPT (prefixed with ttt_) ---
+        const ttt_gameBoard=document.getElementById("ttt-game-board"),ttt_resultScreen=document.getElementById("ttt-resultScreen"),ttt_resultTitle=document.getElementById("ttt-result-title"),ttt_resultText=document.getElementById("ttt-result-text"),ttt_statusDisplay=document.getElementById("ttt-status-display"),ttt_modeSelectScreen=document.getElementById("ttt-modeSelectScreen"),ttt_gameContainer=document.getElementById("ttt-game-container");let ttt_gameMode="ai",ttt_currentPlayer="x",ttt_gameState=Array(9).fill(""),ttt_gameActive=!0;const ttt_winningConditions=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];function ttt_selectMode(e){ttt_gameMode=e,ttt_modeSelectScreen.classList.add("hidden"),ttt_gameContainer.classList.remove("hidden"),ttt_startGame()}function ttt_startGame(){ttt_gameActive=!0,ttt_currentPlayer="x",ttt_gameState.fill(""),ttt_resultScreen.classList.add("hidden"),ttt_gameBoard.innerHTML="",ttt_updateStatus();for(let e=0;e<9;e++){const t=document.createElement("div");t.classList.add("cell"),t.setAttribute("data-cell-index",e),t.addEventListener("click",ttt_handleCellClick),ttt_gameBoard.appendChild(t)}}function ttt_handleCellClick(e){const t=e.target,n=parseInt(t.getAttribute("data-cell-index"));""===ttt_gameState[n]&&ttt_gameActive&&(ttt_placeMark(t,n),ttt_checkResult()||(ttt_changePlayer(),"ai"===ttt_gameMode&&"o"===ttt_currentPlayer&&ttt_gameActive&&(ttt_gameActive=!1,setTimeout(ttt_aiMove,700))))}function ttt_aiMove(){let e=ttt_findBestMove();if(null!==e){const t=document.querySelector(`#tictactoe-container [data-cell-index='${e}']`);ttt_placeMark(t,e),ttt_checkResult()||ttt_changePlayer(),ttt_gameActive=!0}}function ttt_findBestMove(){for(let e=0;e<9;e++)if(""===ttt_gameState[e]){if(ttt_gameState[e]="o",ttt_isWinner("o"))return ttt_gameState[e]="",e;ttt_gameState[e]=""}for(let e=0;e<9;e++)if(""===ttt_gameState[e]){if(ttt_gameState[e]="x",ttt_isWinner("x"))return ttt_gameState[e]="",e;ttt_gameState[e]=""}const e=[4,0,2,6,8,1,3,5,7];for(const t of e)if(""===ttt_gameState[t])return t;return null}function ttt_isWinner(e){return ttt_winningConditions.some(t=>t.every(t=>ttt_gameState[t]===e))}function ttt_placeMark(e,t){ttt_gameState[t]=ttt_currentPlayer,e.classList.add(ttt_currentPlayer)}function ttt_checkResult(){let e=!1,t=[];for(const n of ttt_winningConditions){const[l,o,s]=n;if(ttt_gameState[l]&&ttt_gameState[l]===ttt_gameState[o]&&ttt_gameState[l]===ttt_gameState[s]){e=!0,t=n;break}}return e?(ttt_endGame(!1,t),!0):!ttt_gameState.includes("")&&(ttt_endGame(!0),!0)}function ttt_changePlayer(){ttt_currentPlayer="x"==ttt_currentPlayer?"o":"x",ttt_updateStatus()}function ttt_endGame(e,t=[]){ttt_gameActive=!1,e?(ttt_resultTitle.innerHTML="It's a <span style='color:var(--accent-o)'>Draw!</span>",ttt_resultText.textContent="A well-fought battle."):(t.forEach(e=>{document.querySelector(`#tictactoe-container [data-cell-index='${e}']`).classList.add("win")}),"ai"===ttt_gameMode?ttt_resultTitle.innerHTML="x"==ttt_currentPlayer?"You Win!":"AI Wins!":ttt_resultTitle.innerHTML=`Player <span style='color:var(--accent-${ttt_currentPlayer})'>${ttt_currentPlayer.toUpperCase()}</span> Wins!`,ttt_resultText.textContent="Well played!"),setTimeout(()=>{ttt_resultScreen.classList.remove("hidden")},1200)}function ttt_updateStatus(){ttt_gameActive&&("ai"===ttt_gameMode?ttt_statusDisplay.textContent="x"==ttt_currentPlayer?"Your Turn":"AI is thinking...":ttt_statusDisplay.textContent=`Player ${ttt_currentPlayer.toUpperCase()}'s Turn`)}
+
+        // --- QUICK THINKER SCRIPT (prefixed with qt_) ---
+        const qt_allScreens=document.querySelectorAll("#quickthinker-container .screen, #quickthinker-container .game-screen"),qt_startScreen=document.getElementById("qt-startScreen"),qt_nameInputScreen=document.getElementById("qt-name-input-screen"),qt_gameScreen=document.getElementById("qt-gameScreen"),qt_resultScreen=document.getElementById("qt-resultScreen"),qt_promptDisplay=document.getElementById("prompt-display"),qt_questionView=document.getElementById("question-view"),qt_responseView=document.getElementById("response-view"),qt_timerRing=document.querySelector("#quickthinker-container .timer-ring"),qt_timerTextEl=document.getElementById("timer-text"),qt_singlePlayerUI=document.getElementById("singleplayer-ui"),qt_multiPlayerUI=document.getElementById("multiplayer-ui"),qt_streakDisplay=document.getElementById("streak-display"),qt_p1ScoreDisplay=document.getElementById("p1-score-display"),qt_p2ScoreDisplay=document.getElementById("p2-score-display"),qt_matchTimerProgress=document.getElementById("match-timer-progress"),qt_resultTitle=document.getElementById("qt-result-title"),qt_resultText=document.getElementById("qt-result-text"),qt_basePrompts=["Name 3 things you can find in a bathroom.","Name 3 countries in Europe.","Name 2 yellow fruits.","Name 3 things you can do at a park.","Name 2 famous actors.","Name 3 types of weather.","Name 2 planets in our solar system.","Name 3 things that are cold.","Name 3 sports that use a ball.","Name 2 animals that live in the ocean."],qt_userPrompts=["Who is Anago?","If you ever meet Bill Monday, what 2 questions would you ask him?","Give 2 reasons to love John W. Rich Kid.","Name 5 Mon-animals.","Who is the CTO of Monad?","Name 4 NFT projects on Monad.","Name 3 DEXs on Monad.","List the top 3 coins from the MOB: The CLOB contest.","Name 1 team member of Just Jerry Coin.","Name 1 team member of Kol Token.","Name 1 member of ClobChad.","Name 3 members with the Clobster role in the Kuru Discord.","Name 3 members with the ClobCreator role in the Kuru Discord.","Name 3 members with the Clob-OG role.","Give 2 reasons why $STACHE is better than $FLORIDA."],qt_allPrompts=[...qt_basePrompts,...qt_userPrompts];let qt_gameMode,qt_gameActive,qt_availableQuestions,qt_p1Name,qt_p2Name,qt_p1Score,qt_p2Score,qt_currentPlayer,qt_singlePlayerStreak,qt_questionTimeLeft,qt_matchTimeLeft,qt_questionTimerInterval,qt_matchTimerInterval;const QT_QUESTION_TIME=10,QT_MATCH_TIME=120,qt_ringRadius=65,qt_ringCircumference=2*Math.PI*qt_ringRadius;qt_timerRing.style.strokeDasharray=qt_ringCircumference;function qt_showScreen(e){qt_allScreens.forEach(e=>e.classList.add("hidden")),e.classList.remove("hidden")}function qt_showStartScreen(){qt_showScreen(qt_startScreen)}function qt_setMode(e){qt_gameMode=e,"single"===e?qt_startSinglePlayerGame():qt_showScreen(qt_nameInputScreen)}function qt_startSinglePlayerGame(){qt_showScreen(qt_gameScreen),qt_singlePlayerUI.classList.remove("hidden"),qt_multiPlayerUI.classList.add("hidden"),qt_gameActive=!0,qt_singlePlayerStreak=0,qt_updateStreakDisplay(),qt_nextRound()}function qt_startMultiplayerGame(){qt_p1Name=document.getElementById("p1-name").value||"Player 1",qt_p2Name=document.getElementById("p2-name").value||"Player 2",qt_p1Score=0,qt_p2Score=0,qt_currentPlayer=1,qt_showScreen(qt_gameScreen),qt_singlePlayerUI.classList.add("hidden"),qt_multiPlayerUI.classList.remove("hidden"),qt_availableQuestions=[...qt_allPrompts].sort(()=>.5-Math.random()),qt_gameActive=!0,qt_matchTimeLeft=QT_MATCH_TIME,qt_updateMultiplayerScoreDisplay(),qt_matchTimerInterval&&clearInterval(qt_matchTimerInterval),qt_matchTimerInterval=setInterval(qt_updateMatchTimer,100),qt_nextRound()}function qt_nextRound(){if(qt_questionView.classList.remove("hidden"),qt_responseView.classList.add("hidden"),"multi"===qt_gameMode&&0===qt_availableQuestions.length)return qt_promptDisplay.textContent="No more questions!",void qt_endGame();const e="multi"===qt_gameMode?qt_availableQuestions.pop():qt_allPrompts[Math.floor(Math.random()*qt_allPrompts.length)],t="multi"===qt_gameMode?`<strong class="${1===qt_currentPlayer?"p1-color":"p2-color"} player-name">${1===qt_currentPlayer?qt_p1Name:qt_p2Name}'s Turn:</strong><br>`:"";qt_promptDisplay.innerHTML=t+e,qt_startQuestionTimer()}function qt_startQuestionTimer(){qt_questionTimerInterval&&clearInterval(qt_questionTimerInterval),qt_questionTimeLeft=QT_QUESTION_TIME,qt_timerTextEl.textContent=qt_questionTimeLeft,qt_timerTextEl.classList.remove("urgent"),qt_timerRing.style.transition="none",qt_timerRing.style.strokeDashoffset=0,qt_timerRing.style.stroke="var(--accent-brown)",void qt_timerRing.offsetWidth,qt_timerRing.style.transition=`stroke-dashoffset ${QT_QUESTION_TIME}s linear`,qt_timerRing.style.strokeDashoffset=qt_ringCircumference,qt_questionTimerInterval=setInterval(()=>{qt_questionTimeLeft--,qt_timerTextEl.textContent=Math.max(0,qt_questionTimeLeft),3===qt_questionTimeLeft&&(qt_timerTextEl.classList.add("urgent"),qt_timerRing.style.transition="stroke-dashoffset 3s linear, stroke 0.5s ease-in-out",qt_timerRing.style.stroke="var(--accent-red)"),qt_questionTimeLeft<0&&qt_showResponseButtons()},1e3)}function qt_updateMatchTimer(){qt_matchTimeLeft-=.1,qt_matchTimerProgress.style.width=`${qt_matchTimeLeft/QT_MATCH_TIME*100}%`,qt_matchTimeLeft<=0&&qt_endGame()}function qt_showResponseButtons(){clearInterval(qt_questionTimerInterval),qt_questionView.classList.add("hidden"),qt_responseView.classList.remove("hidden"),document.getElementById("repeat-btn").style.display="multi"===qt_gameMode?"block":"none"}function qt_handleResponse(e){qt_gameActive&&(e?"single"===qt_gameMode?(qt_singlePlayerStreak++,qt_updateStreakDisplay()):(1===qt_currentPlayer?qt_p1Score++:qt_p2Score++,qt_updateMultiplayerScoreDisplay(),qt_currentPlayer=1===qt_currentPlayer?2:1):"single"===qt_gameMode?qt_endGame():qt_currentPlayer=1===qt_currentPlayer?2:1,qt_nextRound())}function qt_handleRepeat(){qt_gameActive&&"multi"===qt_gameMode&&(qt_matchTimeLeft+=7,qt_matchTimeLeft>QT_MATCH_TIME&&(qt_matchTimeLeft=QT_MATCH_TIME),qt_nextRound())}function qt_updateStreakDisplay(){streakDisplay.innerHTML=`<span class="sp-color player-name">Streak: </span><span class="player-score">${qt_singlePlayerStreak}</span>`}function qt_updateMultiplayerScoreDisplay(){qt_p1ScoreDisplay.innerHTML=`<span class="player-name p1-color">${qt_p1Name}</span>: <span class="player-score">${qt_p1Score}</span>`,qt_p2ScoreDisplay.innerHTML=`<span class="player-name p2-color">${qt_p2Name}</span>: <span class="player-score">${qt_p2Score}</span>`}function qt_endGame(){qt_gameActive=!1,clearInterval(qt_questionTimerInterval),clearInterval(qt_matchTimerInterval),"single"===qt_gameMode?(qt_resultTitle.innerHTML=`Game <span class="accent">Over</span>`,qt_resultText.innerHTML=`You got a streak of <strong>${qt_singlePlayerStreak}</strong>!`):qt_p1Score>qt_p2Score?qt_resultTitle.innerHTML=`<span class="p1-color">${qt_p1Name}</span> Wins!`:qt_p2Score>qt_p1Score?qt_resultTitle.innerHTML=`<span class="p2-color">${qt_p2Name}</span> Wins!`:qt_resultTitle.innerHTML=`It's a <span class="accent">Draw!</span>`,qt_resultText.innerHTML=`Final Score:<br><strong class="p1-color">${qt_p1Name}: ${qt_p1Score}</strong> | <strong class="p2-color">${qt_p2Name}: ${qt_p2Score}</strong>`,qt_showScreen(qt_resultScreen)}
+
+        // --- SIMON SAYS SCRIPT (prefixed with ss_) ---
+        const ss_buttons=document.querySelectorAll(".simon-button"),ss_startScreen=document.getElementById("ss-startScreen"),ss_gameOverScreen=document.getElementById("ss-gameOverScreen"),ss_gameBoardWrapper=document.getElementById("ss-game-board-wrapper"),ss_scoreEl=document.getElementById("ss-score"),ss_messageEl=document.getElementById("ss-message"),ss_resultTextEl=document.getElementById("ss-result-text"),ss_colors=["red","brown","blue","green"];let ss_sequence,ss_playerSequence,ss_level,ss_canClick=!1,ss_audioCtx;const ss_tones={red:261.63,brown:293.66,blue:329.63,green:349.23};function ss_playTone(e){ss_audioCtx||(ss_audioCtx=new(window.AudioContext||window.webkitAudioContext));const t=ss_audioCtx.createOscillator();t.type="sine",t.frequency.setValueAtTime(e,ss_audioCtx.currentTime),t.connect(ss_audioCtx.destination),t.start(),t.stop(ss_audioCtx.currentTime+.2)}const ss_sleep=e=>new Promise(t=>setTimeout(t,e));function ss_startGame(){ss_startScreen.classList.add("hidden"),ss_gameOverScreen.classList.add("hidden"),ss_gameBoardWrapper.classList.remove("hidden"),ss_sequence=[],ss_level=0,setTimeout(ss_nextRound,500)}async function ss_nextRound(){ss_level++,ss_scoreEl.textContent=ss_level,ss_playerSequence=[],ss_canClick=!1,ss_sequence.push(ss_colors[Math.floor(4*Math.random())]),ss_messageEl.textContent="Watch...",await ss_sleep(1e3),await ss_playSequence(),ss_messageEl.textContent="Your Turn!",ss_canClick=!0}async function ss_playSequence(){for(const e of ss_sequence){const t=document.getElementById(`ss-${e}`);t.classList.add("lit"),ss_playTone(ss_tones[e]),await ss_sleep(500-10*ss_level),t.classList.remove("lit"),await ss_sleep(200-5*ss_level)}}ss_buttons.forEach(e=>{e.addEventListener("click",()=>ss_handlePlayerClick(e.dataset.color))});async function ss_handlePlayerClick(e){if(ss_canClick){ss_playerSequence.push(e);const t=document.getElementById(`ss-${e}`);t.classList.add("lit"),ss_playTone(ss_tones[e]),await ss_sleep(200),t.classList.remove("lit");const n=ss_playerSequence.length-1;if(ss_playerSequence[n]!==ss_sequence[n])return ss_endGame();ss_playerSequence.length===ss_sequence.length&&(ss_canClick=!1,ss_messageEl.textContent="Correct!",await ss_sleep(1e3),ss_nextRound())}}function ss_endGame(){ss_canClick=!1,ss_gameBoardWrapper.classList.add("hidden"),ss_resultTextEl.textContent=`You reached level ${ss_level}!`,ss_gameOverScreen.classList.remove("hidden")}
     </script>
 </body>
 </html>
-
