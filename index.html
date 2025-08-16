@@ -30,13 +30,18 @@
             font-size: 2.5rem;
             text-transform: uppercase;
         }
+        
+        /* BUG FIX: This wrapper creates the definitive stacking context, fixing the text bleed issue. */
+        #arcade-wrapper {
+            position: relative;
+            z-index: 100;
+        }
 
         #main-container {
             width: 100%;
             max-width: 500px;
             position: relative;
             margin: 0 auto;
-            z-index: 10;
         }
         
         .game-screen {
@@ -163,7 +168,8 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             color: var(--light-grey); text-align: center;
-            background-color: rgba(18, 18, 18, 0.7); backdrop-filter: blur(5px);
+            background-color: rgba(18, 18, 18, 0.85); /* Increased opacity */
+            backdrop-filter: blur(5px);
             transition: opacity 0.3s ease; z-index: 100;
             border-radius: 10px;
             font-family: 'Poppins', sans-serif;
@@ -274,63 +280,66 @@
 
         <!-- === $STACHE ARCADE SECTION === -->
         <section id="stache-arcade" class="game-section">
-            <div class="container">
-                <h2>$STACHE ARCADE</h2>
-                
-                <!-- Quick Thinker Game Container -->
-                <div id="main-container">
-                    <div id="gameScreen" class="game-screen hidden">
-                        <div id="top-bar">
-                            <div id="singleplayer-ui" class="score-display-container hidden">
-                                <div id="streak-display"><span class="sp-color player-name">Streak: </span><span class="player-score">0</span></div>
-                            </div>
-                            <div id="multiplayer-ui" class="hidden" style="width: 100%;">
-                                <div id="match-timer-bar"><div id="match-timer-progress"></div></div>
-                                <div class="score-display-container">
-                                    <div id="p1-score-display">P1: 0</div>
-                                    <div id="p2-score-display">P2: 0</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="game-content-container">
-                            <div id="question-view">
-                                <div id="timer-container">
-                                    <div id="timer-text">10</div>
-                                    <svg id="timer-svg" width="150" height="150">
-                                        <circle class="timer-ring" cx="75" cy="75" r="65"></circle>
-                                    </svg>
-                                </div>
-                                <div id="prompt-display">Get Ready...</div>
-                            </div>
-                            <div id="response-view" class="bottom-controls hidden">
-                                <div id="response-container" style="display: flex; flex-direction: column; align-items: center; gap: 15px; width: 100%;">
-                                    <button id="success-btn" class="game-button" onclick="handleResponse(true)">I Did It!</button>
-                                    <button id="fail-btn" class="game-button" onclick="handleResponse(false)">Couldn't Think</button>
-                                </div>
-                                <button id="repeat-btn" class="game-button" onclick="handleRepeat()">Skip Question (+7s)</button>
-                            </div>
-                        </div>
-                        <div style="height: 50px;"></div> 
-                    </div>
-
-                    <div id="startScreen" class="screen static">
-                        <h1>Quick <span class="accent">Thinker</span></h1>
-                        <p>Choose your game mode</p>
-                        <button class="play-button" style="margin-bottom: 15px;" onclick="setMode('single')">Single Player</button>
-                        <button class="play-button" onclick="setMode('multi')">Play with Friends</button>
-                    </div>
+            <!-- BUG FIX: This wrapper isolates the game's stacking context -->
+            <div id="arcade-wrapper">
+                <div class="container">
+                    <h2>$STACHE ARCADE</h2>
                     
-                    <div id="name-input-screen" class="screen hidden">
-                        <p style="font-size: 20px; font-weight: 800;">Enter Player Names</p>
-                        <input type="text" id="p1-name" class="player-input" placeholder="Player 1 Name" value="Player 1">
-                        <input type="text" id="p2-name" class="player-input" placeholder="Player 2 Name" value="Player 2">
-                        <button class="play-button" onclick="startMultiplayerGame()">Start Match</button>
-                    </div>
+                    <!-- Quick Thinker Game Container -->
+                    <div id="main-container">
+                        <div id="gameScreen" class="game-screen hidden">
+                            <div id="top-bar">
+                                <div id="singleplayer-ui" class="score-display-container hidden">
+                                    <div id="streak-display"><span class="sp-color player-name">Streak: </span><span class="player-score">0</span></div>
+                                </div>
+                                <div id="multiplayer-ui" class="hidden" style="width: 100%;">
+                                    <div id="match-timer-bar"><div id="match-timer-progress"></div></div>
+                                    <div class="score-display-container">
+                                        <div id="p1-score-display">P1: 0</div>
+                                        <div id="p2-score-display">P2: 0</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="game-content-container">
+                                <div id="question-view">
+                                    <div id="timer-container">
+                                        <div id="timer-text">10</div>
+                                        <svg id="timer-svg" width="150" height="150">
+                                            <circle class="timer-ring" cx="75" cy="75" r="65"></circle>
+                                        </svg>
+                                    </div>
+                                    <div id="prompt-display">Get Ready...</div>
+                                </div>
+                                <div id="response-view" class="bottom-controls hidden">
+                                    <div id="response-container" style="display: flex; flex-direction: column; align-items: center; gap: 15px; width: 100%;">
+                                        <button id="success-btn" class="game-button" onclick="handleResponse(true)">I Did It!</button>
+                                        <button id="fail-btn" class="game-button" onclick="handleResponse(false)">Couldn't Think</button>
+                                    </div>
+                                    <button id="repeat-btn" class="game-button" onclick="handleRepeat()">Skip Question (+7s)</button>
+                                </div>
+                            </div>
+                            <div style="height: 50px;"></div> 
+                        </div>
 
-                    <div id="resultScreen" class="screen hidden">
-                        <h1 id="result-title"></h1>
-                        <p id="result-text"></p>
-                        <button class="play-button" onclick="showStartScreen()">Main Menu</button>
+                        <div id="startScreen" class="screen static">
+                            <h1>Quick <span class="accent">Thinker</span></h1>
+                            <p>Choose your game mode</p>
+                            <button class="play-button" style="margin-bottom: 15px;" onclick="setMode('single')">Single Player</button>
+                            <button class="play-button" onclick="setMode('multi')">Play with Friends</button>
+                        </div>
+                        
+                        <div id="name-input-screen" class="screen hidden">
+                            <p style="font-size: 20px; font-weight: 800;">Enter Player Names</p>
+                            <input type="text" id="p1-name" class="player-input" placeholder="Player 1 Name" value="Player 1">
+                            <input type="text" id="p2-name" class="player-input" placeholder="Player 2 Name" value="Player 2">
+                            <button class="play-button" onclick="startMultiplayerGame()">Start Match</button>
+                        </div>
+
+                        <div id="resultScreen" class="screen hidden">
+                            <h1 id="result-title"></h1>
+                            <p id="result-text"></p>
+                            <button class="play-button" onclick="showStartScreen()">Main Menu</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -558,3 +567,4 @@
     </script>
 </body>
 </html>
+
