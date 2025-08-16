@@ -127,7 +127,7 @@
             .screen p { font-size: 14px; margin: 15px 0 25px; }
             .play-button, .arcade-menu-button { font-size: 18px; padding: 12px 30px; }
             #prompt-display { font-size: 18px; }
-            .cell.o::before { border-width: 12px; }
+            #tictactoe-container .cell.o::before { border-width: 12px; }
             #ss-score { font-size: 32px; } #ss-message { font-size: 12px; }
         }
     </style>
@@ -323,12 +323,14 @@
         const qt_container = document.getElementById('quickthinker-container');
         const ss_container = document.getElementById('simonsays-container');
         const arcadeMenu = document.getElementById('arcade-menu');
+
         function showGame(gameName) {
             arcadeMenu.classList.add('hidden');
             if (gameName === 'tictactoe') ttt_container.classList.remove('hidden');
             else if (gameName === 'quickthinker') qt_container.classList.remove('hidden');
             else if (gameName === 'simonsays') ss_container.classList.remove('hidden');
         }
+
         function showArcadeMenu() {
             ttt_container.classList.add('hidden');
             qt_container.classList.add('hidden');
@@ -346,4 +348,4 @@
         const ss_buttons=document.querySelectorAll(".simon-button"),ss_startScreen=document.getElementById("ss-startScreen"),ss_gameOverScreen=document.getElementById("ss-gameOverScreen"),ss_gameBoardWrapper=document.getElementById("ss-game-board-wrapper"),ss_scoreEl=document.getElementById("ss-score"),ss_messageEl=document.getElementById("ss-message"),ss_resultTextEl=document.getElementById("ss-result-text"),ss_colors=["red","brown","blue","green"];let ss_sequence,ss_playerSequence,ss_level,ss_canClick=!1,ss_audioCtx;const ss_tones={red:261.63,brown:293.66,blue:329.63,green:349.23};function ss_playTone(e){ss_audioCtx||(ss_audioCtx=new(window.AudioContext||window.webkitAudioContext));const t=ss_audioCtx.createOscillator();t.type="sine",t.frequency.setValueAtTime(e,ss_audioCtx.currentTime),t.connect(ss_audioCtx.destination),t.start(),t.stop(ss_audioCtx.currentTime+.2)}const ss_sleep=e=>new Promise(t=>setTimeout(t,e));function ss_startGame(){ss_startScreen.classList.add("hidden"),ss_gameOverScreen.classList.add("hidden"),ss_gameBoardWrapper.classList.remove("hidden"),ss_sequence=[],ss_level=0,setTimeout(ss_nextRound,500)}async function ss_nextRound(){ss_level++,ss_scoreEl.textContent=ss_level,ss_playerSequence=[],ss_canClick=!1,ss_sequence.push(ss_colors[Math.floor(4*Math.random())]),ss_messageEl.textContent="Watch...",await ss_sleep(1e3),await ss_playSequence(),ss_messageEl.textContent="Your Turn!",ss_canClick=!0}async function ss_playSequence(){for(const e of ss_sequence){const t=document.getElementById(`ss-${e}`);t.classList.add("lit"),ss_playTone(ss_tones[e]),await ss_sleep(500-10*ss_level),t.classList.remove("lit"),await ss_sleep(200-5*ss_level)}}ss_buttons.forEach(e=>{e.addEventListener("click",()=>ss_handlePlayerClick(e.dataset.color))});async function ss_handlePlayerClick(e){if(ss_canClick){ss_playerSequence.push(e);const t=document.getElementById(`ss-${e}`);t.classList.add("lit"),ss_playTone(ss_tones[e]),await ss_sleep(200),t.classList.remove("lit");const n=ss_playerSequence.length-1;if(ss_playerSequence[n]!==ss_sequence[n])return ss_endGame();ss_playerSequence.length===ss_sequence.length&&(ss_canClick=!1,ss_messageEl.textContent="Correct!",await ss_sleep(1e3),ss_nextRound())}}function ss_endGame(){ss_canClick=!1,ss_gameBoardWrapper.classList.add("hidden"),ss_resultTextEl.textContent=`You reached level ${ss_level}!`,ss_gameOverScreen.classList.remove("hidden")}
     </script>
 </body>
-</html>```
+</html>
